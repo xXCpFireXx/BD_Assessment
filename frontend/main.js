@@ -1,4 +1,6 @@
-// Base API URL (adjust port if needed)
+import { capitalizeEachWord, notification } from "./utils"
+
+// Base API URL
 const API_URL = 'http://localhost:3000';
 
 // DOM Elements
@@ -58,7 +60,7 @@ form.addEventListener('submit', async (event) => {
   const id = customerIdInput.value;
   const customerData = {
     cc_customer: document.getElementById('cc_customer').value,
-    customer_name: document.getElementById('customer_name').value,
+    customer_name: capitalizeEachWord(document.getElementById('customer_name').value),
     address: document.getElementById('address').value,
     phone: document.getElementById('phone').value,
     email: document.getElementById('email').value
@@ -75,16 +77,18 @@ form.addEventListener('submit', async (event) => {
     });
 
     if (!response.ok) {
+      notification("An error occurred.", "#b60404ff", 3000);
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || 'An error occurred.');
     }
 
     await response.json().catch(() => { });
+    notification("Successful!", "#a7c957", 3000);
     resetForm();
     await fetchCustomers();
 
   } catch (error) {
-    console.error('Error saving customer:', error);
+    notification("Error saving customer", "#b60404ff", 3000);
     alert(`Error saving customer: ${error.message}`);
   }
 });
@@ -110,6 +114,7 @@ window.editCustomer = async function (cc) {
     cancelButton.style.display = 'inline-block';
     window.scrollTo(0, 0);
   } catch (err) {
+    notification("Error editing customer", "#b60404ff", 3000);
     console.error('Error editing customer:', err);
   }
 };
