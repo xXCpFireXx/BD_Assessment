@@ -1,62 +1,158 @@
-const apiUrl = 'http://localhost:3000/customers';
-const form = document.getElementById('customerForm');
-const tableBody = document.querySelector('#customerTable tbody');
+// Base API URL (adjust port if needed)
+const API_URL = 'http://localhost:3000';
 
-async function loadCustomers() {
-  const res = await fetch(apiUrl);
-  const data = await res.json();
-  tableBody.innerHTML = '';
-  data.forEach(customer => {
-    const row = `<tr>
-      <td>${customer.cc_customer}</td>
-      <td>${customer.customer_name}</td>
-      <td>${customer.address || ''}</td>
-      <td>${customer.phone || ''}</td>
-      <td>${customer.email}</td>
-      <td>
-        <button onclick="editCustomer('${customer.cc_customer}')" class="btn btn-sm btn-warning">Edit</button>
-        <button onclick="deleteCustomer('${customer.cc_customer}')" class="btn btn-sm btn-danger">Delete</button>
-      </td>
-    </tr>`;
-    tableBody.innerHTML += row;
-  });
+// DOM Elements
+const form = document.getElementById('customer-form');
+const tableBody = document.getElementById('customers-table-body');
+const formTitle = document.getElementById('form-title');
+const customerIdInput = document.getElementById('customer-id');
+const cancelButton = document.getElementById('cancel-button');
+const submitButton = document.getElementById('submit-button');
+
+/**
+ * Fetch all customers from the backend and render them in the table.
+ */
+async function fetchCustomers() {
+  try {
+    const response = await fetch(`${API_URL}/customers`);
+    if (!response.ok) throw new Error('Error connecting to API');
+    const customers = await response.json();
+
+    tableBody.innerHTML = '';
+
+    if (!customers || customers.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="6" class="center muted">No customers found.</td></tr>';
+      return;
+    }
+
+    customers.forEach(customer => {
+      const row = document.createElement('tr');
+
+      row.innerHTML = `
+        <td>${escapeHtml(customer.cc_customer)}</td>
+        <td>${escapeHtml(customer.customer_name)}</td>
+        <td>${escapeHtml(customer.address || '')}</td>
+        <td>${escapeHtml(customer.phone || '')}</td>
+        <td>${escapeHtml(customer.email)}</td>
+        <td class="actions-cell">
+          <button class="action-link edit" onclick="editCustomer('${customer.cc_customer}')">Edit</button>
+          <button class="action-link delete" onclick="deleteCustomer('${customer.cc_customer}')">Delete</button>
+        </td>
+      `;
+
+      tableBody.appendChild(row);
+    });
+
+  } catch (err) {
+    console.error(err);
+    tableBody.innerHTML = '<tr><td colspan="6" class="center muted">Error loading customers. Check console.</td></tr>';
+  }
 }
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const id = document.getElementById('id').value;
-  const body = {
+/**
+ * Handle form submission to create or update a customer.
+ */
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const id = customerIdInput.value;
+  const customerData = {
     cc_customer: document.getElementById('cc_customer').value,
     customer_name: document.getElementById('customer_name').value,
     address: document.getElementById('address').value,
     phone: document.getElementById('phone').value,
     email: document.getElementById('email').value
   };
+
   const method = id ? 'PUT' : 'POST';
-  const url = id ? `${apiUrl}/${id}` : apiUrl;
-  await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  form.reset();
-  document.getElementById('id').value = '';
-  loadCustomers();
+  const url = id ? `${API_URL}/customers/${id}` : `${API_URL}/customers`;
+
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(customerData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'An error occurred.');
+    }
+
+    await response.json().catch(() => { });
+    resetForm();
+    await fetchCustomers();
+
+  } catch (error) {
+    console.error('Error saving customer:', error);
+    alert(`Error saving customer: ${error.message}`);
+  }
 });
 
+/**
+ * Fill the form with customer data for editing.
+ */
 window.editCustomer = async function (cc) {
-  const res = await fetch(`${apiUrl}`);
-  const data = await res.json();
-  const customer = data.find(c => c.cc_customer === cc);
-  document.getElementById('id').value = customer.cc_customer;
-  document.getElementById('cc_customer').value = customer.cc_customer;
-  document.getElementById('customer_name').value = customer.customer_name;
-  document.getElementById('address').value = customer.address || '';
-  document.getElementById('phone').value = customer.phone || '';
-  document.getElementById('email').value = customer.email;
-};
+  try {
+    const res = await fetch(`${API_URL}/customers`);
+    const customers = await res.json();
+    const customer = customers.find(c => c.cc_customer === cc);
 
-window.deleteCustomer = async function (cc) {
-  if (confirm('Delete this customer?')) {
-    await fetch(`${apiUrl}/${cc}`, { method: 'DELETE' });
-    loadCustomers();
+    formTitle.textContent = 'Edit Customer';
+    customerIdInput.value = customer.cc_customer;
+    document.getElementById('cc_customer').value = customer.cc_customer;
+    document.getElementById('customer_name').value = customer.customer_name;
+    document.getElementById('address').value = customer.address || '';
+    document.getElementById('phone').value = customer.phone || '';
+    document.getElementById('email').value = customer.email;
+
+    submitButton.textContent = 'Update Customer';
+    cancelButton.style.display = 'inline-block';
+    window.scrollTo(0, 0);
+  } catch (err) {
+    console.error('Error editing customer:', err);
   }
 };
 
-loadCustomers();
+/**
+ * Delete a customer from the database.
+ */
+window.deleteCustomer = async function (cc) {
+  if (!confirm('Are you sure you want to delete this customer?')) return;
+  try {
+    const response = await fetch(`${API_URL}/customers/${cc}`, { method: 'DELETE' });
+    if (!response.ok) throw new Error('Unable to delete customer.');
+    await fetchCustomers();
+  } catch (err) {
+    console.error('Error deleting customer:', err);
+    alert('Error deleting customer.');
+  }
+};
+
+/**
+ * Reset the form to its initial state.
+ */
+function resetForm() {
+  form.reset();
+  customerIdInput.value = '';
+  formTitle.textContent = 'Add New Customer';
+  submitButton.textContent = 'Save Customer';
+  cancelButton.style.display = 'none';
+}
+
+cancelButton.addEventListener('click', resetForm);
+
+document.addEventListener('DOMContentLoaded', fetchCustomers);
+
+/**
+ * Escape potentially unsafe characters to prevent XSS.
+ */
+function escapeHtml(text) {
+  if (text == null) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
