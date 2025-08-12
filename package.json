@@ -1,8 +1,11 @@
 {
-  "name": "bd_assessment_cristian_penagos_gosling",
+  "name": "bd_assessment",
   "version": "1.0.0",
-  "description": "",
+  "description": "This system organizes financial data from Fintech platforms into a SQL database with CRUD and advanced queries.",
   "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite"
@@ -14,7 +17,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/xXCpFireXx/BD_Assessment/issues"
   },
@@ -26,5 +29,8 @@
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
     "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "vite": "^7.1.2"
   }
 }

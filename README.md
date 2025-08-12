@@ -28,6 +28,7 @@ Convert Excel to CSV. Run `node load_data.js`.
 ## Relational Model
 
 
+
 ## Developer Info
 * Name: Cristian Alejandro Penagos Suárez
 * Clan: Gosling
