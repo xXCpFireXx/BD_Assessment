@@ -84,33 +84,45 @@ The system’s database follows **Third Normal Form (3NF)**:
 
 ---
 
-## 📥 Bulk CSV Import Instructions
-You can bulk load data from CSV files into PostgreSQL using the `COPY` command.
+## 📥 Bulk CSV Import Using Node.js Scripts
 
-Example:
-```sql
-COPY customers(cc_customer, customer_name, address, phone, email)
-FROM '/absolute/path/customers.csv'
-DELIMITER ','
-CSV HEADER;
+This project includes **Node.js scripts** for bulk importing CSV files.
 
-COPY invoices(invoice_number, billing_period, billed_amount, paid_amount, cc_customer)
-FROM '/absolute/path/invoices.csv'
-DELIMITER ','
-CSV HEADER;
+### 1️⃣ Import Customers
+The script `upload_costumers.js` reads the file `docs/docs-csv/customers.csv` and inserts the records into the `customers` table.
 
-COPY transactions(id_transaction, t_date_time, t_amount, t_status, t_type, platform_used, invoice_number)
-FROM '/absolute/path/transactions.csv'
-DELIMITER ','
-CSV HEADER;
+Run:
+```bash
+cd backend
+node upload_costumers.js
 ```
 
-⚠️ **Important:**  
-- Ensure the file path is accessible to PostgreSQL.
-- Use **absolute paths** (e.g., `/home/user/data.csv`).
-- CSV files must match the column order and data types.
+### 2️⃣ Import Invoices
+The script `upload_invoices.js` reads the file `backend/upload_invoices.js` and inserts the records into the `invoices` table.
+
+Run:
+```bash
+cd backend
+node upload_invoices.js
+```
+
+### 3️⃣ Import Transactions
+The script `upload_transactions.js` reads the file `docs/docs-csv/transactions.csv` and inserts the records into the `transactions` table.
+
+Run:
+```bash
+cd backend
+node upload_transactions.js
+```
+
+⚠️ **Important:**
+CSV files must be placed inside docs/docs-csv/ (relative path as used in the scripts).
+
+The .env file must contain valid PostgreSQL credentials and located in `/backend`.
+Data types and column names must match the table definitions in the database.
 
 ---
+
 
 ## 🔍 Advanced SQL Queries
 
