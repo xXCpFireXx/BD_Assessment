@@ -17,7 +17,7 @@ const connection = new Pool({
 
 const inserts = []; // Aquí acumularemos las promesas
 
-fs.createReadStream('../docs/customers.csv')
+fs.createReadStream('../docs/docs-csv/customers.csv')
   .pipe(csv())
   .on('data', (row) => {
     const query = connection.query(
