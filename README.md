@@ -83,7 +83,7 @@ The system’s database follows **Third Normal Form (3NF)**:
 - `transactions` → Payments or charges linked to an invoice.
 
 ### Relational Model
-<img width="546" height="771" alt="MODELO RELACIONAL - PRUEBA BD" src="https://github.com/user-attachments/assets/d2f834fe-c170-4ef7-b7c5-82ea869c83f4" />
+<img width="546" height="771" alt="MODELO RELACIONAL - PRUEBA BD" src="./docs/MODELO RELACIONAL - PRUEBA BD.png" />
 
 ---
 
