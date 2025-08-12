@@ -1,4 +1,4 @@
-Número de Factura,Periodo de Facturación,Monto Facturado,Monto Pagado,cc_customer
+invoice_number,billing_period,invoiced_amount,paid_amount,cc_customer
 FAC1190,2024-07,40302,40302,969677194
 FAC1208,2024-07,97457,96457,857630459
 FAC1309,2024-06,153404,153404,625774276

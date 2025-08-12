@@ -1,4 +1,4 @@
-id transaction, transaction date time,transaction amount,transaction status,transaction type,platform used,invoice number
+id_transaction,transaction_date_time,transaction_amount,transaction_status,transaction_type,platform_used,invoice_number
 TXN001,2024-06-01 10:00:00,38940,Pendiente,Pago de Factura,Nequi,FAC7068
 TXN002,2024-07-09 12:00:00,75145,Pendiente,Pago de Factura,Daviplata,FAC6577
 TXN003,2024-06-13 10:00:00,179217,Fallida,Pago de Factura,Daviplata,FAC5707
